@@ -1,0 +1,13 @@
+{
+    "name": "dacod/symphony-routing",
+    "authors": [
+        {
+            "name": "Dacod",
+            "email": "clerk.dacod@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/routing": "^5.0",
+        "symfony/http-foundation": "^5.0"
+    }
+}
