@@ -17,12 +17,12 @@ use SymphonyRouting\Controllers\TestController;
 try {
     $getEndpoint = new Route(
         '/get-endpoint',
-        ['controller' => TestController::class, 'method' => 'sayBye']
+        ['controller' => TestController::class, 'method' => 'sayHi']
     );
 
     $postEndpoint = new Route(
         '/post-endpoint',
-        ['controller' => TestController::class, 'method' => 'sayHi']
+        ['controller' => TestController::class, 'method' => 'sayBye']
     );
 
     // Add Route object(s) to RouteCollection object
@@ -56,6 +56,7 @@ try {
     $v1RoutesPOST->addPrefix('/api/v1');
 
     $rootCollection->addCollection($v1RoutesGET);
+    $rootCollection->addCollection($v1RoutesPOST);
 
     // Init RequestContext object
     $context = new RequestContext('/');
@@ -69,13 +70,15 @@ try {
 
     // Return the controller for the current route
     $controller = new $parameters['controller']();
-    $controller->{$parameters['method']}();
+    $controller->{$parameters['method']}(new Request());
 
     exit;
 } catch (ResourceNotFoundException $e) {
+
     //throws error if route is not found
     echo $e->getMessage();
 } catch (MethodNotAllowedException $e) {
+
     //throws error if incorrect method used on existing route
     $context = new RequestContext('/');
     $context->fromRequest(Request::createFromGlobals());
