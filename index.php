@@ -15,32 +15,25 @@ use Symfony\Component\Routing\RouteCollection;
 use SymphonyRouting\Controllers\TestController;
 
 try {
-    $getEndpoint = new Route(
-        '/get-endpoint',
-        ['controller' => TestController::class, 'method' => 'sayHi']
-    );
-
-    $postEndpoint = new Route(
-        '/post-endpoint',
-        ['controller' => TestController::class, 'method' => 'sayBye']
-    );
-
-    // Add Route object(s) to RouteCollection object
-    $rootCollection = new RouteCollection();
 
     /**
      * for get methods
      * sets routes for get methods
      * and assigns the prefix api/v1
      */
+    $getEndpoint = new Route(
+        '/get-endpoint',// Your path
+        // Your controller + the method you would like to call from the controller
+        ['controller' => TestController::class, 'method' => 'sayHi']
+    );
     $v1RoutesGET = new RouteCollection();
-    //Note name is just then I'm giving to this method,
-    //it's just a label
+    // Note name is just then I'm giving to this method,
+    // It's just a label
     $v1RoutesGET->add("get_greeting", $getEndpoint);
-    //set method to GET
+    // Set method to GET
     $v1RoutesGET->setMethods(['GET']);
-    //assign prefix
-    //endpoint now accessible via url/api/v1/get-endpoint
+    // Adds api/v1 prefix so URL is prefixed
+    // Url will be baseURL/api/get-endpoint/
     $v1RoutesGET->addPrefix('/api/v1');
 
 
@@ -50,11 +43,23 @@ try {
      * and assigns the prefix api/v1
      * refer to comments for $v1RoutesGet to better understand
      */
+    $postEndpoint = new Route(
+        '/post-endpoint',//Your path
+        // Your controller + the method you would like to call from the controller
+        ['controller' => TestController::class, 'method' => 'sayBye']
+    );
     $v1RoutesPOST = new RouteCollection();
+    // Note name is just then I'm giving to this method,
+    // It's just a label
     $v1RoutesPOST->add('post_endpoint', $postEndpoint);
     $v1RoutesPOST->setMethods(['POST']);
+    // Adds api/v1 prefix so URL is prefixed
+    // Url will be baseURL/api/v1/post-endpoint/
     $v1RoutesPOST->addPrefix('/api/v1');
 
+    // Create route collection and add routes
+    // Add Route object(s) to RouteCollection object
+    $rootCollection = new RouteCollection();
     $rootCollection->addCollection($v1RoutesGET);
     $rootCollection->addCollection($v1RoutesPOST);
 
@@ -75,11 +80,11 @@ try {
     exit;
 } catch (ResourceNotFoundException $e) {
 
-    //throws error if route is not found
+    // Throws error if route is not found
     echo $e->getMessage();
 } catch (MethodNotAllowedException $e) {
 
-    //throws error if incorrect method used on existing route
+    // Throws error if incorrect method used on existing route
     $context = new RequestContext('/');
     $context->fromRequest(Request::createFromGlobals());
     echo $context->getMethod(). " not allowed.";
