@@ -10,9 +10,12 @@
         "symfony/routing": "^5.0",
         "symfony/http-foundation": "^5.0",
         "friendsofphp/php-cs-fixer": "^3.4",
-        "ext-json": "*"
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.4",
+        "phpunit/phpunit": "^9.5"
     },
     "scripts": {
+        "test": "./vendor/bin/phpunit",
         "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
     }
 }

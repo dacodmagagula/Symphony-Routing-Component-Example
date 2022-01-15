@@ -74,8 +74,8 @@ try {
     $parameters = $matcher->match($context->getPathInfo());
 
     // Return the controller for the current route
-    $controller = new $parameters['controller']();
-    $controller->{$parameters['method']}(new Request());
+    $controller = new $parameters['controller'](new Request());
+    $controller->{$parameters['method']}();
 
     exit;
 } catch (ResourceNotFoundException $e) {
