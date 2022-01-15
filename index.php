@@ -73,8 +73,10 @@ try {
 
     exit;
 } catch (ResourceNotFoundException $e) {
+    //throws error if route is not found
     echo $e->getMessage();
 } catch (MethodNotAllowedException $e) {
+    //throws error if incorrect method used on existing route
     $context = new RequestContext('/');
     $context->fromRequest(Request::createFromGlobals());
     echo $context->getMethod(). " not allowed.";
