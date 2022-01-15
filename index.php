@@ -1,74 +1,81 @@
 <?php
 
+declare(strict_types=1);
+
 require_once('./vendor/autoload.php');
 require_once('./controllers/TestController.php');
 
-use SymphonyRouting\Controllers\TestController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGenerator;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
- 
-try
-{
-	// print_r(getallheaders());
-    $api = new Route(
-      '/category',
-      array('controller' => TestController::class, 'method'=>'sayBye')
+use Symfony\Component\Routing\RouteCollection;
+use SymphonyRouting\Controllers\TestController;
+
+try {
+    $getEndpoint = new Route(
+        '/get-endpoint',
+        ['controller' => TestController::class, 'method' => 'sayBye']
     );
 
-    $product = new Route(
-      '/product',
-      array('controller' => TestController::class, 'method'=>'sayHi')
+    $postEndpoint = new Route(
+        '/post-endpoint',
+        ['controller' => TestController::class, 'method' => 'sayHi']
     );
- 
-
 
     // Add Route object(s) to RouteCollection object
     $rootCollection = new RouteCollection();
 
-    $routesv1 = new RouteCollection();
-    $routesv1->add('api', $api);
-    $routesv1->add('product', $product);
-    $routesv1->addPrefix('/api/v1');
-    $routesv1->setMethods(['GET']);
+    /**
+     * for get methods
+     * sets routes for get methods
+     * and assigns the prefix api/v1
+     */
+    $v1RoutesGET = new RouteCollection();
+    //Note name is just then I'm giving to this method,
+    //it's just a label
+    $v1RoutesGET->add("get_greeting", $getEndpoint);
+    //set method to GET
+    $v1RoutesGET->setMethods(['GET']);
+    //assign prefix
+    //endpoint now accessible via url/api/v1/get-endpoint
+    $v1RoutesGET->addPrefix('/api/v1');
 
-    $rootCollection->addCollection($routesv1);
 
- 
+    /**
+     * for post methods
+     * sets routes for post methods
+     * and assigns the prefix api/v1
+     * refer to comments for $v1RoutesGet to better understand
+     */
+    $v1RoutesPOST = new RouteCollection();
+    $v1RoutesPOST->add('post_endpoint', $postEndpoint);
+    $v1RoutesPOST->setMethods(['POST']);
+    $v1RoutesPOST->addPrefix('/api/v1');
+
+    $rootCollection->addCollection($v1RoutesGET);
+
     // Init RequestContext object
     $context = new RequestContext('/');
     $context->fromRequest(Request::createFromGlobals());
-    
- 
+
     // Init UrlMatcher object
     $matcher = new UrlMatcher($rootCollection, $context);
 
     // Find the current route
- 	$parameters = $matcher->match($context->getPathInfo());
-    // Find the current route
+    $parameters = $matcher->match($context->getPathInfo());
 
+    // Return the controller for the current route
+    $controller = new $parameters['controller']();
+    $controller->{$parameters['method']}();
 
-
- 	$controller = new $parameters['controller'];
- 	$controller->{$parameters['method']}();
-
-    
     exit;
- 
-
-}
-
-catch (ResourceNotFoundException $e)
-{
-  echo $e->getMessage();
-}
-
-catch (MethodNotAllowedException $e)
-{
-  echo $context->getMethod(). " not allowed.";
+} catch (ResourceNotFoundException $e) {
+    echo $e->getMessage();
+} catch (MethodNotAllowedException $e) {
+    $context = new RequestContext('/');
+    $context->fromRequest(Request::createFromGlobals());
+    echo $context->getMethod(). " not allowed.";
 }
